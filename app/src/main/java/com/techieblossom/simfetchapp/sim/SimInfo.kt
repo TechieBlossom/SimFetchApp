@@ -1,4 +1,4 @@
-package co.tide.universal.carrier
+package com.techieblossom.simfetchapp.sim
 
 data class SimInfo(
     val subscriptionId: Int,

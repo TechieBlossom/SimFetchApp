@@ -9,7 +9,6 @@ import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import co.tide.universal.carrier.SimInfo
 import co.tide.universal.carrier.isSimActive
 
 internal class SimSelector(private val context: Context) {
@@ -34,11 +33,22 @@ internal class SimSelector(private val context: Context) {
                 try {
                     val telephonyManager =
                         defaultTelephonyManager.createForSubscriptionId(it.subscriptionId)
+
+                    val phoneNumber = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                val number = subscriptionManager.getPhoneNumber(it.subscriptionId)
+                                if (number.isBlank() || number.isEmpty()) {
+                                    it.number
+                                }
+                            }
+
+                            it.number
+                        }
+
                     val simInfo = SimInfo(
                         subscriptionId = it.subscriptionId,
                         subscriptionType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) it.subscriptionType else null,
-                        phoneNumber = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                            subscriptionManager.getPhoneNumber(it.subscriptionId) else it.number,
+                        phoneNumber = phoneNumber(),
                         isSimActive = telephonyManager.isSimActive(),
                         simSlotIndex = it.simSlotIndex,
                         carrierName = telephonyManager?.simOperatorName
