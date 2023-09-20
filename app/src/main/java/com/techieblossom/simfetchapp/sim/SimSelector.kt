@@ -35,15 +35,15 @@ internal class SimSelector(private val context: Context) {
                         defaultTelephonyManager.createForSubscriptionId(it.subscriptionId)
 
                     val phoneNumber = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                val number = subscriptionManager.getPhoneNumber(it.subscriptionId)
-                                if (number.isBlank() || number.isEmpty()) {
-                                    it.number
-                                }
-                            }
-
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                             it.number
                         }
+
+                        val number = subscriptionManager.getPhoneNumber(it.subscriptionId)
+                        number.ifBlank {
+                            it.number
+                        }
+                    }
 
                     val simInfo = SimInfo(
                         subscriptionId = it.subscriptionId,
